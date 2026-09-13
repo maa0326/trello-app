@@ -1,12 +1,19 @@
 import { useState } from 'react'
 
+const PRIORITIES = [
+  { value: 'low', label: '低' },
+  { value: 'mid', label: '中' },
+  { value: 'high', label: '高' },
+]
+
 function CardModal({ card, onClose, onSave }) {
   const [title, setTitle] = useState(card.title)
   const [description, setDescription] = useState(card.description || '')
   const [dueDate, setDueDate] = useState(card.dueDate || '')
+  const [priority, setPriority] = useState(card.priority || 'mid')
 
   const handleSave = () => {
-    onSave(card.id, { title: title.trim() || card.title, description, dueDate })
+    onSave(card.id, { title: title.trim() || card.title, description, dueDate, priority })
     onClose()
   }
 
@@ -22,6 +29,23 @@ function CardModal({ card, onClose, onSave }) {
           期限日
           <input type="date" value={dueDate} onChange={(e) => setDueDate(e.target.value)} />
         </label>
+
+        <div className="modal-label">
+          優先度
+          <div className="priority-picker">
+            {PRIORITIES.map((p) => (
+              <button
+                type="button"
+                key={p.value}
+                className={`priority-option priority-${p.value} ${priority === p.value ? 'selected' : ''}`}
+                onClick={() => setPriority(p.value)}
+              >
+                {priority === p.value ? '✓ ' : ''}
+                {p.label}
+              </button>
+            ))}
+          </div>
+        </div>
 
         <label className="modal-label">
           説明

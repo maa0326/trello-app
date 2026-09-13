@@ -6,16 +6,19 @@ const initialData = {
       id: 'list-1',
       title: '未着手',
       cards: [],
+      sortMode: 'manual',
     },
     {
       id: 'list-2',
       title: '作業中',
       cards: [],
+      sortMode: 'manual',
     },
     {
       id: 'list-3',
       title: '完了',
       cards: [],
+      sortMode: 'manual',
     },
   ],
 }

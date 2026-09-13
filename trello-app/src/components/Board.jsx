@@ -28,7 +28,7 @@ function Board({ data, setData }) {
     if (!title) return
     setData((prev) => ({
       ...prev,
-      lists: [...prev.lists, { id: uuid(), title, cards: [] }],
+      lists: [...prev.lists, { id: uuid(), title, cards: [], sortMode: 'manual' }],
     }))
     setNewListTitle('')
   }
@@ -52,7 +52,20 @@ function Board({ data, setData }) {
       ...prev,
       lists: prev.lists.map((l) =>
         l.id === listId
-          ? { ...l, cards: [...l.cards, { id: uuid(), title, description: '', dueDate: '' }] }
+          ? {
+              ...l,
+              cards: [
+                ...l.cards,
+                {
+                  id: uuid(),
+                  title,
+                  description: '',
+                  dueDate: '',
+                  priority: 'mid',
+                  createdAt: Date.now(),
+                },
+              ],
+            }
           : l
       ),
     }))
@@ -64,6 +77,13 @@ function Board({ data, setData }) {
       lists: prev.lists.map((l) =>
         l.id === listId ? { ...l, cards: l.cards.filter((c) => c.id !== cardId) } : l
       ),
+    }))
+  }
+
+  const handleChangeSortMode = (listId, sortMode) => {
+    setData((prev) => ({
+      ...prev,
+      lists: prev.lists.map((l) => (l.id === listId ? { ...l, sortMode } : l)),
     }))
   }
 
@@ -95,6 +115,10 @@ function Board({ data, setData }) {
         findListByCardId(lists, overId) || lists.find((l) => l.id === overId)
       if (!targetList) return prev
 
+      if (sourceList.id === targetList.id && sourceList.sortMode !== 'manual') {
+        return prev
+      }
+
       const sourceIndex = sourceList.cards.findIndex((c) => c.id === activeId)
       const [movedCard] = sourceList.cards.splice(sourceIndex, 1)
 
@@ -119,6 +143,7 @@ function Board({ data, setData }) {
             onDeleteCard={handleDeleteCard}
             onOpenCard={setOpenCard}
             onRenameList={handleRenameList}
+            onChangeSortMode={handleChangeSortMode}
           />
         ))}
       </DndContext>

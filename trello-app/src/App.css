@@ -92,6 +92,82 @@
   padding-right: 18px;
 }
 
+.priority-badge {
+  display: inline-block;
+  font-size: 11px;
+  font-weight: bold;
+  padding: 1px 8px;
+  border-radius: 10px;
+  margin-bottom: 4px;
+  color: white;
+}
+
+.priority-badge.priority-low {
+  background: #61bd4f;
+}
+
+.priority-badge.priority-mid {
+  background: #f2b024;
+}
+
+.priority-badge.priority-high {
+  background: #eb5a46;
+}
+
+.sort-mode-picker {
+  display: flex;
+  gap: 4px;
+  margin-bottom: 8px;
+}
+
+.sort-option {
+  flex: 1;
+  border: none;
+  background: #dfe1e6;
+  color: #172b4d;
+  font-size: 11px;
+  padding: 4px 2px;
+  border-radius: 4px;
+  cursor: pointer;
+}
+
+.sort-option.selected {
+  background: #0079bf;
+  color: white;
+}
+
+.priority-picker {
+  display: flex;
+  gap: 6px;
+  margin-top: 4px;
+}
+
+.priority-option {
+  flex: 1;
+  border: 2px solid transparent;
+  padding: 8px;
+  border-radius: 4px;
+  cursor: pointer;
+  font-weight: bold;
+  color: white;
+}
+
+.priority-option.priority-low {
+  background: #61bd4f;
+}
+
+.priority-option.priority-mid {
+  background: #f2b024;
+}
+
+.priority-option.priority-high {
+  background: #eb5a46;
+}
+
+.priority-option.selected {
+  border-color: #172b4d;
+}
+
 .card-due {
   margin-top: 6px;
   font-size: 12px;

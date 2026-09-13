@@ -1,6 +1,8 @@
 import { useSortable } from '@dnd-kit/sortable'
 import { CSS } from '@dnd-kit/utilities'
 
+const PRIORITY_LABEL = { low: '低', mid: '中', high: '高' }
+
 function Card({ card, onClick, onDelete }) {
   const { attributes, listeners, setNodeRef, transform, transition, isDragging } =
     useSortable({ id: card.id, data: { type: 'card' } })
@@ -20,6 +22,9 @@ function Card({ card, onClick, onDelete }) {
       className="card"
       onClick={() => onClick(card)}
     >
+      <span className={`priority-badge priority-${card.priority || 'mid'}`}>
+        {PRIORITY_LABEL[card.priority || 'mid']}
+      </span>
       <div className="card-title">{card.title}</div>
       {card.dueDate && <div className="card-due">期限: {card.dueDate}</div>}
       <button

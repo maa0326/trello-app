@@ -2,10 +2,27 @@ import { useState } from 'react'
 import { useDroppable } from '@dnd-kit/core'
 import { SortableContext, verticalListSortingStrategy } from '@dnd-kit/sortable'
 import Card from './Card'
+import { sortCards } from '../sort'
 
-function List({ list, onAddCard, onDeleteList, onDeleteCard, onOpenCard, onRenameList }) {
+const SORT_OPTIONS = [
+  { value: 'manual', label: '手動' },
+  { value: 'priority', label: '優先度順' },
+  { value: 'newest', label: '新着順' },
+]
+
+function List({
+  list,
+  onAddCard,
+  onDeleteList,
+  onDeleteCard,
+  onOpenCard,
+  onRenameList,
+  onChangeSortMode,
+}) {
   const [newCardTitle, setNewCardTitle] = useState('')
   const { setNodeRef } = useDroppable({ id: list.id, data: { type: 'list' } })
+  const sortMode = list.sortMode || 'manual'
+  const displayedCards = sortCards(list.cards, sortMode)
 
   const handleAddCard = (e) => {
     e.preventDefault()
@@ -28,9 +45,23 @@ function List({ list, onAddCard, onDeleteList, onDeleteCard, onOpenCard, onRenam
         </button>
       </div>
 
+      <div className="sort-mode-picker">
+        {SORT_OPTIONS.map((opt) => (
+          <button
+            type="button"
+            key={opt.value}
+            className={`sort-option ${sortMode === opt.value ? 'selected' : ''}`}
+            onClick={() => onChangeSortMode(list.id, opt.value)}
+          >
+            {sortMode === opt.value ? '✓ ' : ''}
+            {opt.label}
+          </button>
+        ))}
+      </div>
+
       <div className="card-list" ref={setNodeRef}>
-        <SortableContext items={list.cards.map((c) => c.id)} strategy={verticalListSortingStrategy}>
-          {list.cards.map((card) => (
+        <SortableContext items={displayedCards.map((c) => c.id)} strategy={verticalListSortingStrategy}>
+          {displayedCards.map((card) => (
             <Card key={card.id} card={card} onClick={onOpenCard} onDelete={(id) => onDeleteCard(list.id, id)} />
           ))}
         </SortableContext>
