@@ -1,0 +1,218 @@
+.app {
+  min-height: 100vh;
+  background: #0079bf;
+  display: flex;
+  flex-direction: column;
+}
+
+.app-header {
+  padding: 12px 20px;
+  color: white;
+}
+
+.app-header h1 {
+  margin: 0;
+  font-size: 20px;
+}
+
+.board {
+  display: flex;
+  align-items: flex-start;
+  gap: 12px;
+  padding: 0 20px 20px;
+  overflow-x: auto;
+  flex: 1;
+}
+
+.list {
+  background: #ebecf0;
+  border-radius: 8px;
+  width: 260px;
+  min-width: 260px;
+  padding: 8px;
+  display: flex;
+  flex-direction: column;
+}
+
+.list-header {
+  display: flex;
+  align-items: center;
+  gap: 4px;
+  margin-bottom: 8px;
+}
+
+.list-title-input {
+  flex: 1;
+  border: none;
+  background: transparent;
+  font-weight: bold;
+  font-size: 14px;
+  padding: 4px 6px;
+  border-radius: 4px;
+}
+
+.list-title-input:hover,
+.list-title-input:focus {
+  background: white;
+  outline: none;
+}
+
+.list-delete {
+  border: none;
+  background: transparent;
+  color: #6b778c;
+  cursor: pointer;
+  font-size: 12px;
+  padding: 4px 6px;
+  border-radius: 4px;
+}
+
+.list-delete:hover {
+  background: #d9dbe0;
+}
+
+.card-list {
+  display: flex;
+  flex-direction: column;
+  gap: 6px;
+  min-height: 4px;
+}
+
+.card {
+  position: relative;
+  background: white;
+  border-radius: 6px;
+  padding: 8px 10px;
+  box-shadow: 0 1px 0 rgba(9, 30, 66, 0.25);
+  cursor: grab;
+}
+
+.card-title {
+  font-size: 14px;
+  padding-right: 18px;
+}
+
+.card-due {
+  margin-top: 6px;
+  font-size: 12px;
+  color: #5e6c84;
+}
+
+.card-delete {
+  position: absolute;
+  top: 4px;
+  right: 4px;
+  border: none;
+  background: transparent;
+  color: #6b778c;
+  cursor: pointer;
+  font-size: 14px;
+  line-height: 1;
+  padding: 2px 4px;
+}
+
+.card-delete:hover {
+  color: #172b4d;
+}
+
+.add-card-form input {
+  width: 100%;
+  box-sizing: border-box;
+  border: none;
+  background: transparent;
+  padding: 8px 6px;
+  font-size: 14px;
+  border-radius: 4px;
+  margin-top: 4px;
+}
+
+.add-card-form input:hover,
+.add-card-form input:focus {
+  background: white;
+  outline: none;
+}
+
+.add-list-form {
+  width: 260px;
+  min-width: 260px;
+}
+
+.add-list-form input {
+  width: 100%;
+  box-sizing: border-box;
+  border: none;
+  background: rgba(255, 255, 255, 0.24);
+  color: white;
+  padding: 10px 12px;
+  font-size: 14px;
+  border-radius: 8px;
+}
+
+.add-list-form input::placeholder {
+  color: rgba(255, 255, 255, 0.85);
+}
+
+.add-list-form input:focus {
+  outline: none;
+  background: rgba(255, 255, 255, 0.4);
+}
+
+.modal-overlay {
+  position: fixed;
+  inset: 0;
+  background: rgba(0, 0, 0, 0.5);
+  display: flex;
+  align-items: flex-start;
+  justify-content: center;
+  padding-top: 80px;
+}
+
+.modal {
+  background: white;
+  border-radius: 8px;
+  padding: 20px;
+  width: 420px;
+  max-width: 90vw;
+  display: flex;
+  flex-direction: column;
+  gap: 14px;
+}
+
+.modal-label {
+  display: flex;
+  flex-direction: column;
+  gap: 6px;
+  font-size: 13px;
+  font-weight: bold;
+  color: #172b4d;
+}
+
+.modal-label input,
+.modal-label textarea {
+  font-family: inherit;
+  font-size: 14px;
+  font-weight: normal;
+  padding: 8px;
+  border: 1px solid #dfe1e6;
+  border-radius: 4px;
+  resize: vertical;
+}
+
+.modal-actions {
+  display: flex;
+  justify-content: flex-end;
+  gap: 8px;
+}
+
+.modal-actions button {
+  border: none;
+  padding: 8px 14px;
+  border-radius: 4px;
+  cursor: pointer;
+  font-size: 14px;
+}
+
+.modal-actions .primary {
+  background: #0079bf;
+  color: white;
+}
