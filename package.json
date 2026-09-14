@@ -1,0 +1,12 @@
+{
+  "name": "trello-app-monorepo",
+  "private": true,
+  "scripts": {
+    "dev": "concurrently -n backend,frontend -c blue,green \"npm:dev:backend\" \"npm:dev:frontend\"",
+    "dev:backend": "cd backend && mvnw.cmd spring-boot:run",
+    "dev:frontend": "cd trello-app && npm run dev"
+  },
+  "devDependencies": {
+    "concurrently": "^9.1.0"
+  }
+}
