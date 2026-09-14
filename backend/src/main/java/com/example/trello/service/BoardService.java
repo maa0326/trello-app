@@ -2,6 +2,7 @@ package com.example.trello.service;
 
 import com.example.trello.dto.*;
 import com.example.trello.entity.Card;
+import com.example.trello.entity.Priority;
 import com.example.trello.entity.TaskList;
 import com.example.trello.repository.CardRepository;
 import com.example.trello.repository.TaskListRepository;
@@ -78,6 +79,13 @@ public class BoardService {
 
     public void deleteCard(Long cardId) {
         cardRepository.deleteById(cardId);
+    }
+
+    public List<CardDto> searchCards(String keyword, Priority priority) {
+        return cardRepository.search(keyword, priority)
+                .stream()
+                .map(this::toDto)
+                .toList();
     }
 
     public void moveCard(Long cardId, MoveCardRequest request) {

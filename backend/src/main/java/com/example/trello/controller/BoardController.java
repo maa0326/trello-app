@@ -1,6 +1,7 @@
 package com.example.trello.controller;
 
 import com.example.trello.dto.*;
+import com.example.trello.entity.Priority;
 import com.example.trello.service.BoardService;
 import jakarta.validation.Valid;
 import lombok.RequiredArgsConstructor;
@@ -58,5 +59,13 @@ public class BoardController {
     @PutMapping("/cards/{cardId}/move")
     public void moveCard(@PathVariable Long cardId, @Valid @RequestBody MoveCardRequest request) {
         boardService.moveCard(cardId, request);
+    }
+
+    @GetMapping("/cards/search")
+    public List<CardDto> searchCards(
+            @RequestParam(required = false) String keyword,
+            @RequestParam(required = false) Priority priority
+    ) {
+        return boardService.searchCards(keyword, priority);
     }
 }
