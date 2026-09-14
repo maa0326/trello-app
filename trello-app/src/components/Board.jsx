@@ -1,5 +1,4 @@
 import { useState } from 'react'
-import { v4 as uuid } from 'uuid'
 import {
   DndContext,
   PointerSensor,
@@ -9,6 +8,8 @@ import {
 } from '@dnd-kit/core'
 import List from './List'
 import CardModal from './CardModal'
+import * as api from '../api'
+import { normalizeCard, normalizeList } from '../normalize'
 
 function findListByCardId(lists, cardId) {
   return lists.find((list) => list.cards.some((c) => c.id === cardId))
@@ -22,72 +23,57 @@ function Board({ data, setData }) {
     useSensor(PointerSensor, { activationConstraint: { distance: 5 } })
   )
 
-  const handleAddList = (e) => {
+  const handleAddList = async (e) => {
     e.preventDefault()
     const title = newListTitle.trim()
     if (!title) return
-    setData((prev) => ({
-      ...prev,
-      lists: [...prev.lists, { id: uuid(), title, cards: [], sortMode: 'manual' }],
-    }))
     setNewListTitle('')
+    const created = await api.createList(title)
+    setData((prev) => ({ ...prev, lists: [...prev.lists, normalizeList(created)] }))
   }
 
-  const handleDeleteList = (listId) => {
-    setData((prev) => ({
-      ...prev,
-      lists: prev.lists.filter((l) => l.id !== listId),
-    }))
+  const handleDeleteList = async (listId) => {
+    setData((prev) => ({ ...prev, lists: prev.lists.filter((l) => l.id !== listId) }))
+    await api.deleteList(listId)
   }
 
-  const handleRenameList = (listId, title) => {
+  const handleRenameList = async (listId, title) => {
     setData((prev) => ({
       ...prev,
       lists: prev.lists.map((l) => (l.id === listId ? { ...l, title } : l)),
     }))
+    await api.updateList(listId, { title })
   }
 
-  const handleAddCard = (listId, title) => {
+  const handleAddCard = async (listId, title) => {
+    const created = await api.createCard(listId, title)
     setData((prev) => ({
       ...prev,
       lists: prev.lists.map((l) =>
-        l.id === listId
-          ? {
-              ...l,
-              cards: [
-                ...l.cards,
-                {
-                  id: uuid(),
-                  title,
-                  description: '',
-                  dueDate: '',
-                  priority: 'mid',
-                  createdAt: Date.now(),
-                },
-              ],
-            }
-          : l
+        l.id === listId ? { ...l, cards: [...l.cards, normalizeCard(created)] } : l
       ),
     }))
   }
 
-  const handleDeleteCard = (listId, cardId) => {
+  const handleDeleteCard = async (listId, cardId) => {
     setData((prev) => ({
       ...prev,
       lists: prev.lists.map((l) =>
         l.id === listId ? { ...l, cards: l.cards.filter((c) => c.id !== cardId) } : l
       ),
     }))
+    await api.deleteCard(cardId)
   }
 
-  const handleChangeSortMode = (listId, sortMode) => {
+  const handleChangeSortMode = async (listId, sortMode) => {
     setData((prev) => ({
       ...prev,
       lists: prev.lists.map((l) => (l.id === listId ? { ...l, sortMode } : l)),
     }))
+    await api.updateList(listId, { sortMode })
   }
 
-  const handleSaveCard = (cardId, updates) => {
+  const handleSaveCard = async (cardId, updates) => {
     setData((prev) => ({
       ...prev,
       lists: prev.lists.map((l) => ({
@@ -95,6 +81,12 @@ function Board({ data, setData }) {
         cards: l.cards.map((c) => (c.id === cardId ? { ...c, ...updates } : c)),
       })),
     }))
+    await api.updateCard(cardId, {
+      title: updates.title,
+      description: updates.description,
+      dueDate: updates.dueDate || null,
+      priority: updates.priority ? updates.priority.toUpperCase() : undefined,
+    })
   }
 
   const handleDragEnd = (event) => {
@@ -104,6 +96,8 @@ function Board({ data, setData }) {
     const activeId = active.id
     const overId = over.id
     if (activeId === overId) return
+
+    let moveInfo = null
 
     setData((prev) => {
       const lists = prev.lists.map((l) => ({ ...l, cards: [...l.cards] }))
@@ -127,8 +121,14 @@ function Board({ data, setData }) {
 
       targetList.cards.splice(targetIndex, 0, movedCard)
 
+      moveInfo = { cardId: activeId, targetListId: targetList.id, targetPosition: targetIndex }
+
       return { ...prev, lists }
     })
+
+    if (moveInfo) {
+      api.moveCard(moveInfo.cardId, moveInfo.targetListId, moveInfo.targetPosition)
+    }
   }
 
   return (

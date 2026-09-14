@@ -15,6 +15,20 @@
   font-size: 20px;
 }
 
+.error-banner {
+  margin: 0 20px 12px;
+  padding: 10px 14px;
+  background: #eb5a46;
+  color: white;
+  border-radius: 6px;
+  font-size: 13px;
+}
+
+.loading {
+  color: white;
+  padding: 0 20px;
+}
+
 .board {
   display: flex;
   align-items: flex-start;
