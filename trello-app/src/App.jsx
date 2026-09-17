@@ -1,13 +1,20 @@
 import { useEffect, useState } from 'react'
 import Board from './components/Board'
-import { getBoard } from './api'
-import { normalizeBoard } from './normalize'
+import SearchBar from './components/SearchBar'
+import SearchResults from './components/SearchResults'
+import { getBoard, searchCards } from './api'
+import { normalizeBoard, normalizeCard } from './normalize'
 import './App.css'
 
 function App() {
   const [data, setData] = useState({ lists: [] })
   const [loading, setLoading] = useState(true)
   const [error, setError] = useState(null)
+
+  const [isSearching, setIsSearching] = useState(false)
+  const [searchResults, setSearchResults] = useState([])
+  const [searchLoading, setSearchLoading] = useState(false)
+  const [searchError, setSearchError] = useState(null)
 
   useEffect(() => {
     getBoard()
@@ -16,13 +23,36 @@ function App() {
       .finally(() => setLoading(false))
   }, [])
 
+  const handleSearch = ({ keyword, priority }) => {
+    setIsSearching(true)
+    setSearchLoading(true)
+    setSearchError(null)
+    searchCards({ keyword, priority })
+      .then((cards) => setSearchResults((cards || []).map(normalizeCard)))
+      .catch((err) => setSearchError(err.message))
+      .finally(() => setSearchLoading(false))
+  }
+
+  const handleClearSearch = () => {
+    setIsSearching(false)
+    setSearchResults([])
+    setSearchError(null)
+  }
+
   return (
     <div className="app">
       <header className="app-header">
         <h1>My Trello</h1>
+        <SearchBar onSearch={handleSearch} onClear={handleClearSearch} isSearching={isSearching} />
       </header>
       {error && <p className="error-banner">通信エラー: {error}（バックエンドが起動しているか確認してください）</p>}
-      {loading ? <p className="loading">読み込み中...</p> : <Board data={data} setData={setData} />}
+      {loading ? (
+        <p className="loading">読み込み中...</p>
+      ) : isSearching ? (
+        <SearchResults cards={searchResults} loading={searchLoading} error={searchError} />
+      ) : (
+        <Board data={data} setData={setData} />
+      )}
     </div>
   )
 }
