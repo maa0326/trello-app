@@ -57,6 +57,7 @@ public class BoardController {
     }
 
     @PutMapping("/cards/{cardId}/move")
+    @ResponseStatus(HttpStatus.NO_CONTENT)
     public void moveCard(@PathVariable Long cardId, @Valid @RequestBody MoveCardRequest request) {
         boardService.moveCard(cardId, request);
     }
