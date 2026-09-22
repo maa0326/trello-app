@@ -6,14 +6,17 @@ import com.example.trello.entity.TaskList;
 import com.example.trello.repository.CardDeletionLogRepository;
 import com.example.trello.repository.CardRepository;
 import com.example.trello.repository.TaskListRepository;
+import com.example.trello.security.JwtService;
 import org.junit.jupiter.api.AfterEach;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.boot.test.context.SpringBootTest;
 import org.springframework.boot.webmvc.test.autoconfigure.AutoConfigureMockMvc;
+import org.springframework.http.HttpHeaders;
 import org.springframework.http.MediaType;
 import org.springframework.test.web.servlet.MockMvc;
+import org.springframework.test.web.servlet.request.MockHttpServletRequestBuilder;
 
 import static org.springframework.test.web.servlet.request.MockMvcRequestBuilders.delete;
 import static org.springframework.test.web.servlet.request.MockMvcRequestBuilders.patch;
@@ -40,6 +43,13 @@ class BoardServiceIntegrationTest {
 
     @Autowired
     private CardDeletionLogRepository cardDeletionLogRepository;
+
+    @Autowired
+    private JwtService jwtService;
+
+    private MockHttpServletRequestBuilder authed(MockHttpServletRequestBuilder builder) {
+        return builder.header(HttpHeaders.AUTHORIZATION, "Bearer " + jwtService.generateToken("test-user"));
+    }
 
     private TaskList listA;
     private TaskList listB;
@@ -83,9 +93,9 @@ class BoardServiceIntegrationTest {
 
     @Test
     void カードを別リストへ移動できる() throws Exception {
-        mockMvc.perform(put("/api/cards/" + card1.getId() + "/move")
+        mockMvc.perform(authed(put("/api/cards/" + card1.getId() + "/move")
                         .contentType(MediaType.APPLICATION_JSON)
-                        .content("{\"targetListId\":" + listB.getId() + ",\"targetPosition\":0}"))
+                        .content("{\"targetListId\":" + listB.getId() + ",\"targetPosition\":0}")))
                 .andExpect(status().isNoContent());
 
         Card moved = cardRepository.findById(card1.getId()).orElseThrow();
@@ -94,16 +104,16 @@ class BoardServiceIntegrationTest {
 
     @Test
     void カードをピン留めできる() throws Exception {
-        mockMvc.perform(patch("/api/cards/" + card1.getId())
+        mockMvc.perform(authed(patch("/api/cards/" + card1.getId())
                         .contentType(MediaType.APPLICATION_JSON)
-                        .content("{\"pinned\":true}"))
+                        .content("{\"pinned\":true}")))
                 .andExpect(status().isOk())
                 .andExpect(jsonPath("$.pinned").value(true));
     }
 
     @Test
     void カード削除時に削除ログが記録される() throws Exception {
-        mockMvc.perform(delete("/api/cards/" + card1.getId()))
+        mockMvc.perform(authed(delete("/api/cards/" + card1.getId())))
                 .andExpect(status().isNoContent());
 
         org.assertj.core.api.Assertions.assertThat(cardRepository.findById(card1.getId())).isEmpty();
@@ -113,18 +123,18 @@ class BoardServiceIntegrationTest {
 
     @Test
     void 存在しないリストIDを更新しようとすると404が返る() throws Exception {
-        mockMvc.perform(patch("/api/lists/999999")
+        mockMvc.perform(authed(patch("/api/lists/999999")
                         .contentType(MediaType.APPLICATION_JSON)
-                        .content("{\"title\":\"x\"}"))
+                        .content("{\"title\":\"x\"}")))
                 .andExpect(status().isNotFound())
                 .andExpect(jsonPath("$.status").value(404));
     }
 
     @Test
     void 不正なsortModeを指定すると400が返る() throws Exception {
-        mockMvc.perform(patch("/api/lists/" + listA.getId())
+        mockMvc.perform(authed(patch("/api/lists/" + listA.getId())
                         .contentType(MediaType.APPLICATION_JSON)
-                        .content("{\"sortMode\":\"invalid\"}"))
+                        .content("{\"sortMode\":\"invalid\"}")))
                 .andExpect(status().isBadRequest());
     }
 }
