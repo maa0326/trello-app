@@ -11,8 +11,92 @@
 }
 
 .app-header h1 {
-  margin: 0 0 10px;
+  margin: 0;
   font-size: 20px;
+}
+
+.app-header-top {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  margin-bottom: 10px;
+}
+
+.user-menu {
+  display: flex;
+  align-items: center;
+  gap: 8px;
+  font-size: 13px;
+}
+
+.user-menu button {
+  padding: 4px 10px;
+  border: none;
+  border-radius: 4px;
+  background: rgba(255, 255, 255, 0.24);
+  color: white;
+  cursor: pointer;
+}
+
+.user-menu button:hover {
+  background: rgba(255, 255, 255, 0.4);
+}
+
+.login-page {
+  min-height: 100vh;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  background: #0079bf;
+}
+
+.login-form {
+  background: white;
+  border-radius: 8px;
+  padding: 28px;
+  width: 320px;
+  max-width: 90vw;
+  display: flex;
+  flex-direction: column;
+  gap: 14px;
+}
+
+.login-form h1 {
+  margin: 0;
+  font-size: 20px;
+  text-align: center;
+}
+
+.login-tabs {
+  display: flex;
+  gap: 4px;
+}
+
+.login-tabs button {
+  flex: 1;
+  border: none;
+  background: #dfe1e6;
+  color: #172b4d;
+  padding: 8px;
+  border-radius: 4px;
+  cursor: pointer;
+}
+
+.login-tabs button.selected {
+  background: #0079bf;
+  color: white;
+}
+
+.login-form button[type='submit'] {
+  border: none;
+  padding: 10px;
+  border-radius: 4px;
+  cursor: pointer;
+}
+
+.login-form button[type='submit']:disabled {
+  opacity: 0.6;
+  cursor: not-allowed;
 }
 
 .search-bar {

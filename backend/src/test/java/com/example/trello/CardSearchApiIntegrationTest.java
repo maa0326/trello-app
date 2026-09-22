@@ -5,13 +5,16 @@ import com.example.trello.entity.Priority;
 import com.example.trello.entity.TaskList;
 import com.example.trello.repository.CardRepository;
 import com.example.trello.repository.TaskListRepository;
+import com.example.trello.security.JwtService;
 import org.junit.jupiter.api.AfterEach;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.boot.webmvc.test.autoconfigure.AutoConfigureMockMvc;
 import org.springframework.boot.test.context.SpringBootTest;
+import org.springframework.http.HttpHeaders;
 import org.springframework.test.web.servlet.MockMvc;
+import org.springframework.test.web.servlet.request.MockHttpServletRequestBuilder;
 
 import static org.hamcrest.Matchers.containsInAnyOrder;
 import static org.hamcrest.Matchers.hasSize;
@@ -36,7 +39,14 @@ class CardSearchApiIntegrationTest {
     @Autowired
     private CardRepository cardRepository;
 
+    @Autowired
+    private JwtService jwtService;
+
     private TaskList list;
+
+    private MockHttpServletRequestBuilder authed(MockHttpServletRequestBuilder builder) {
+        return builder.header(HttpHeaders.AUTHORIZATION, "Bearer " + jwtService.generateToken("test-user"));
+    }
 
     @BeforeEach
     void setUp() {
@@ -71,7 +81,7 @@ class CardSearchApiIntegrationTest {
 
     @Test
     void キーワード検索でPostgreSQLに保存したカードが取得できる() throws Exception {
-        mockMvc.perform(get("/api/cards/search").param("keyword", "請求書"))
+        mockMvc.perform(authed(get("/api/cards/search").param("keyword", "請求書")))
                 .andExpect(status().isOk())
                 .andExpect(jsonPath("$", hasSize(2)))
                 .andExpect(jsonPath("$[*].title", containsInAnyOrder("請求書を作成する", "請求書の控えを保管する")));
@@ -79,7 +89,7 @@ class CardSearchApiIntegrationTest {
 
     @Test
     void 優先度検索でPostgreSQLに保存したカードが取得できる() throws Exception {
-        mockMvc.perform(get("/api/cards/search").param("priority", "HIGH"))
+        mockMvc.perform(authed(get("/api/cards/search").param("priority", "HIGH")))
                 .andExpect(status().isOk())
                 .andExpect(jsonPath("$", hasSize(1)))
                 .andExpect(jsonPath("$[0].title").value("請求書を作成する"));
@@ -87,7 +97,7 @@ class CardSearchApiIntegrationTest {
 
     @Test
     void キーワード未指定なら全件返す() throws Exception {
-        mockMvc.perform(get("/api/cards/search"))
+        mockMvc.perform(authed(get("/api/cards/search")))
                 .andExpect(status().isOk())
                 .andExpect(jsonPath("$", hasSize(3)));
     }
