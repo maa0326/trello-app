@@ -46,3 +46,11 @@ export function moveCard(cardId, targetListId, targetPosition) {
     body: JSON.stringify({ targetListId, targetPosition }),
   })
 }
+
+export function searchCards({ keyword, priority } = {}) {
+  const params = new URLSearchParams()
+  if (keyword) params.set('keyword', keyword)
+  if (priority) params.set('priority', priority.toUpperCase())
+  const query = params.toString()
+  return request(`/cards/search${query ? `?${query}` : ''}`)
+}
