@@ -54,6 +54,27 @@
   cursor: pointer;
 }
 
+.app-crash {
+  min-height: 100vh;
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  justify-content: center;
+  gap: 12px;
+  padding: 20px;
+  text-align: center;
+  color: white;
+  background: #0079bf;
+}
+
+.app-crash button {
+  padding: 8px 16px;
+  border: none;
+  border-radius: 4px;
+  background: white;
+  cursor: pointer;
+}
+
 .loading {
   color: white;
   padding: 0 20px;
