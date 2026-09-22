@@ -5,6 +5,7 @@ export function normalizeCard(card) {
     dueDate: card.dueDate || '',
     description: card.description || '',
     pinned: card.pinned || false,
+    pinnedAt: card.pinnedAt || null,
   }
 }
 

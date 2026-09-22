@@ -13,6 +13,7 @@ import lombok.RequiredArgsConstructor;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
+import java.time.Instant;
 import java.util.ArrayList;
 import java.util.List;
 
@@ -80,6 +81,7 @@ public class BoardService {
         }
         if (request.pinned() != null) {
             card.setPinned(request.pinned());
+            card.setPinnedAt(request.pinned() ? Instant.now() : null);
         }
         return toDto(cardRepository.save(card));
     }
@@ -152,7 +154,8 @@ public class BoardService {
                 card.getPriority(),
                 card.getPosition(),
                 card.getCreatedAt().toEpochMilli(),
-                card.isPinned()
+                card.isPinned(),
+                card.getPinnedAt() != null ? card.getPinnedAt().toEpochMilli() : null
         );
     }
 }

@@ -12,6 +12,7 @@ public record CardDto(
         Priority priority,
         int position,
         long createdAt,
-        boolean pinned
+        boolean pinned,
+        Long pinnedAt
 ) {
 }
