@@ -50,6 +50,10 @@
   font-size: 13px;
 }
 
+.board-error {
+  cursor: pointer;
+}
+
 .loading {
   color: white;
   padding: 0 20px;

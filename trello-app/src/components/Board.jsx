@@ -18,6 +18,7 @@ function findListByCardId(lists, cardId) {
 function Board({ data, setData }) {
   const [newListTitle, setNewListTitle] = useState('')
   const [openCard, setOpenCard] = useState(null)
+  const [error, setError] = useState(null)
 
   const sensors = useSensors(
     useSensor(PointerSensor, { activationConstraint: { distance: 5 } })
@@ -28,52 +29,85 @@ function Board({ data, setData }) {
     const title = newListTitle.trim()
     if (!title) return
     setNewListTitle('')
-    const created = await api.createList(title)
-    setData((prev) => ({ ...prev, lists: [...prev.lists, normalizeList(created)] }))
+    try {
+      const created = await api.createList(title)
+      setData((prev) => ({ ...prev, lists: [...prev.lists, normalizeList(created)] }))
+    } catch (err) {
+      setError(err.message)
+    }
   }
 
   const handleDeleteList = async (listId) => {
+    const prevData = data
     setData((prev) => ({ ...prev, lists: prev.lists.filter((l) => l.id !== listId) }))
-    await api.deleteList(listId)
+    try {
+      await api.deleteList(listId)
+    } catch (err) {
+      setData(prevData)
+      setError(err.message)
+    }
   }
 
   const handleRenameList = async (listId, title) => {
+    const prevData = data
     setData((prev) => ({
       ...prev,
       lists: prev.lists.map((l) => (l.id === listId ? { ...l, title } : l)),
     }))
-    await api.updateList(listId, { title })
+    try {
+      await api.updateList(listId, { title })
+    } catch (err) {
+      setData(prevData)
+      setError(err.message)
+    }
   }
 
   const handleAddCard = async (listId, title) => {
-    const created = await api.createCard(listId, title)
-    setData((prev) => ({
-      ...prev,
-      lists: prev.lists.map((l) =>
-        l.id === listId ? { ...l, cards: [...l.cards, normalizeCard(created)] } : l
-      ),
-    }))
+    try {
+      const created = await api.createCard(listId, title)
+      setData((prev) => ({
+        ...prev,
+        lists: prev.lists.map((l) =>
+          l.id === listId ? { ...l, cards: [...l.cards, normalizeCard(created)] } : l
+        ),
+      }))
+    } catch (err) {
+      setError(err.message)
+    }
   }
 
   const handleDeleteCard = async (listId, cardId) => {
+    const prevData = data
     setData((prev) => ({
       ...prev,
       lists: prev.lists.map((l) =>
         l.id === listId ? { ...l, cards: l.cards.filter((c) => c.id !== cardId) } : l
       ),
     }))
-    await api.deleteCard(cardId)
+    try {
+      await api.deleteCard(cardId)
+    } catch (err) {
+      setData(prevData)
+      setError(err.message)
+    }
   }
 
   const handleChangeSortMode = async (listId, sortMode) => {
+    const prevData = data
     setData((prev) => ({
       ...prev,
       lists: prev.lists.map((l) => (l.id === listId ? { ...l, sortMode } : l)),
     }))
-    await api.updateList(listId, { sortMode })
+    try {
+      await api.updateList(listId, { sortMode })
+    } catch (err) {
+      setData(prevData)
+      setError(err.message)
+    }
   }
 
   const handleTogglePin = async (cardId, pinned) => {
+    const prevData = data
     setData((prev) => ({
       ...prev,
       lists: prev.lists.map((l) => ({
@@ -81,10 +115,16 @@ function Board({ data, setData }) {
         cards: l.cards.map((c) => (c.id === cardId ? { ...c, pinned } : c)),
       })),
     }))
-    await api.updateCard(cardId, { pinned })
+    try {
+      await api.updateCard(cardId, { pinned })
+    } catch (err) {
+      setData(prevData)
+      setError(err.message)
+    }
   }
 
   const handleSaveCard = async (cardId, updates) => {
+    const prevData = data
     setData((prev) => ({
       ...prev,
       lists: prev.lists.map((l) => ({
@@ -92,12 +132,17 @@ function Board({ data, setData }) {
         cards: l.cards.map((c) => (c.id === cardId ? { ...c, ...updates } : c)),
       })),
     }))
-    await api.updateCard(cardId, {
-      title: updates.title,
-      description: updates.description,
-      dueDate: updates.dueDate || null,
-      priority: updates.priority ? updates.priority.toUpperCase() : undefined,
-    })
+    try {
+      await api.updateCard(cardId, {
+        title: updates.title,
+        description: updates.description,
+        dueDate: updates.dueDate || null,
+        priority: updates.priority ? updates.priority.toUpperCase() : undefined,
+      })
+    } catch (err) {
+      setData(prevData)
+      setError(err.message)
+    }
   }
 
   const handleDragEnd = (event) => {
@@ -108,6 +153,7 @@ function Board({ data, setData }) {
     const overId = over.id
     if (activeId === overId) return
 
+    const prevData = data
     let moveInfo = null
 
     setData((prev) => {
@@ -138,12 +184,22 @@ function Board({ data, setData }) {
     })
 
     if (moveInfo) {
-      api.moveCard(moveInfo.cardId, moveInfo.targetListId, moveInfo.targetPosition)
+      api
+        .moveCard(moveInfo.cardId, moveInfo.targetListId, moveInfo.targetPosition)
+        .catch((err) => {
+          setData(prevData)
+          setError(err.message)
+        })
     }
   }
 
   return (
     <div className="board">
+      {error && (
+        <p className="error-banner board-error" onClick={() => setError(null)}>
+          操作に失敗しました: {error}(クリックで閉じる)
+        </p>
+      )}
       <DndContext sensors={sensors} collisionDetection={closestCorners} onDragEnd={handleDragEnd}>
         {data.lists.map((list) => (
           <List
