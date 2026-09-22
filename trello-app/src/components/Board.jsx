@@ -111,11 +111,12 @@ function Board({ data, setData }) {
 
   const handleTogglePin = async (cardId, pinned) => {
     const prevData = data
+    const pinnedAt = pinned ? Date.now() : null
     setData((prev) => ({
       ...prev,
       lists: prev.lists.map((l) => ({
         ...l,
-        cards: l.cards.map((c) => (c.id === cardId ? { ...c, pinned } : c)),
+        cards: l.cards.map((c) => (c.id === cardId ? { ...c, pinned, pinnedAt } : c)),
       })),
     }))
     try {

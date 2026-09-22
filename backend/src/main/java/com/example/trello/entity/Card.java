@@ -38,6 +38,8 @@ public class Card {
     @Column(nullable = false, columnDefinition = "boolean default false")
     private boolean pinned = false;
 
+    private Instant pinnedAt;
+
     @CreationTimestamp
     @Column(nullable = false, updatable = false)
     private Instant createdAt;

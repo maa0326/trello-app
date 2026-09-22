@@ -10,12 +10,19 @@ function byNewest(a, b) {
   return (b.createdAt || 0) - (a.createdAt || 0)
 }
 
+function byPinnedOrder(a, b) {
+  return (a.pinnedAt || 0) - (b.pinnedAt || 0)
+}
+
 export function sortCards(cards, sortMode) {
-  if (sortMode === 'priority' || sortMode === 'newest') {
-    const compare = sortMode === 'priority' ? byPriority : byNewest
-    const pinned = cards.filter((c) => c.pinned).sort(compare)
-    const rest = cards.filter((c) => !c.pinned).sort(compare)
-    return [...pinned, ...rest]
+  const pinned = cards.filter((c) => c.pinned).sort(byPinnedOrder)
+  const rest = cards.filter((c) => !c.pinned)
+
+  if (sortMode === 'priority') {
+    return [...pinned, ...rest.sort(byPriority)]
   }
-  return cards
+  if (sortMode === 'newest') {
+    return [...pinned, ...rest.sort(byNewest)]
+  }
+  return [...pinned, ...rest]
 }
