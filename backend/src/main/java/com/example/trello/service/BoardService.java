@@ -2,8 +2,10 @@ package com.example.trello.service;
 
 import com.example.trello.dto.*;
 import com.example.trello.entity.Card;
+import com.example.trello.entity.CardDeletionLog;
 import com.example.trello.entity.Priority;
 import com.example.trello.entity.TaskList;
+import com.example.trello.repository.CardDeletionLogRepository;
 import com.example.trello.repository.CardRepository;
 import com.example.trello.repository.TaskListRepository;
 import jakarta.persistence.EntityNotFoundException;
@@ -20,6 +22,7 @@ public class BoardService {
 
     private final TaskListRepository taskListRepository;
     private final CardRepository cardRepository;
+    private final CardDeletionLogRepository cardDeletionLogRepository;
 
     public List<TaskListDto> getBoard() {
         return taskListRepository.findAllByOrderByPositionAsc()
@@ -81,6 +84,8 @@ public class BoardService {
     }
 
     public void deleteCard(Long cardId) {
+        Card card = getCardOrThrow(cardId);
+        cardDeletionLogRepository.save(new CardDeletionLog(card.getId(), card.getTitle()));
         cardRepository.deleteById(cardId);
     }
 
