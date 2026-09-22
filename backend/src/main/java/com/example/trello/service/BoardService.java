@@ -74,6 +74,9 @@ public class BoardService {
         if (request.priority() != null) {
             card.setPriority(request.priority());
         }
+        if (request.pinned() != null) {
+            card.setPinned(request.pinned());
+        }
         return toDto(cardRepository.save(card));
     }
 
@@ -136,7 +139,8 @@ public class BoardService {
                 card.getDueDate(),
                 card.getPriority(),
                 card.getPosition(),
-                card.getCreatedAt().toEpochMilli()
+                card.getCreatedAt().toEpochMilli(),
+                card.isPinned()
         );
     }
 }

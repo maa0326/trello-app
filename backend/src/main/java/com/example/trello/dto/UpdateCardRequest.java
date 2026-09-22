@@ -8,6 +8,7 @@ public record UpdateCardRequest(
         String title,
         String description,
         LocalDate dueDate,
-        Priority priority
+        Priority priority,
+        Boolean pinned
 ) {
 }

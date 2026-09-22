@@ -18,6 +18,7 @@ function List({
   onOpenCard,
   onRenameList,
   onChangeSortMode,
+  onTogglePin,
 }) {
   const [newCardTitle, setNewCardTitle] = useState('')
   const { setNodeRef } = useDroppable({ id: list.id, data: { type: 'list' } })
@@ -62,7 +63,13 @@ function List({
       <div className="card-list" ref={setNodeRef}>
         <SortableContext items={displayedCards.map((c) => c.id)} strategy={verticalListSortingStrategy}>
           {displayedCards.map((card) => (
-            <Card key={card.id} card={card} onClick={onOpenCard} onDelete={(id) => onDeleteCard(list.id, id)} />
+            <Card
+              key={card.id}
+              card={card}
+              onClick={onOpenCard}
+              onDelete={(id) => onDeleteCard(list.id, id)}
+              onTogglePin={onTogglePin}
+            />
           ))}
         </SortableContext>
       </div>
