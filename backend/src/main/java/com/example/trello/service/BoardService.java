@@ -13,6 +13,7 @@ import lombok.RequiredArgsConstructor;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
+import java.util.ArrayList;
 import java.util.List;
 
 @Service
@@ -101,16 +102,22 @@ public class BoardService {
         TaskList sourceList = card.getTaskList();
         TaskList targetList = getListOrThrow(request.targetListId());
 
-        sourceList.getCards().remove(card);
-        reindex(sourceList.getCards());
+        // TaskList.cards は orphanRemoval=true のため、collection の remove/add 経由で
+        // 付け替えるとHibernateがsourceList側の除去を「孤立」と見なして物理削除してしまう。
+        // そのためCard自体のposition/taskListを直接更新し、collectionには触れない。
+        List<Card> sourceCards = new ArrayList<>(sourceList.getCards());
+        sourceCards.removeIf(c -> c.getId().equals(cardId));
+        reindex(sourceCards);
+        cardRepository.saveAll(sourceCards);
 
-        int insertAt = Math.max(0, Math.min(request.targetPosition(), targetList.getCards().size()));
-        targetList.getCards().add(insertAt, card);
+        List<Card> targetCards = sourceList.getId().equals(targetList.getId())
+                ? sourceCards
+                : new ArrayList<>(targetList.getCards());
+        int insertAt = Math.max(0, Math.min(request.targetPosition(), targetCards.size()));
+        targetCards.add(insertAt, card);
         card.setTaskList(targetList);
-        reindex(targetList.getCards());
-
-        taskListRepository.save(sourceList);
-        taskListRepository.save(targetList);
+        reindex(targetCards);
+        cardRepository.saveAll(targetCards);
     }
 
     private void reindex(List<Card> cards) {

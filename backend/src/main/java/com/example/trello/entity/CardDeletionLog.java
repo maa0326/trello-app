@@ -4,6 +4,7 @@ import jakarta.persistence.*;
 import lombok.Getter;
 import lombok.NoArgsConstructor;
 import lombok.Setter;
+import org.hibernate.annotations.CreationTimestamp;
 
 import java.time.Instant;
 
@@ -24,8 +25,9 @@ public class CardDeletionLog {
     @Column(nullable = false)
     private String title;
 
-    @Column(nullable = false)
-    private Instant deletedAt = Instant.now();
+    @CreationTimestamp
+    @Column(nullable = false, updatable = false)
+    private Instant deletedAt;
 
     public CardDeletionLog(Long cardId, String title) {
         this.cardId = cardId;

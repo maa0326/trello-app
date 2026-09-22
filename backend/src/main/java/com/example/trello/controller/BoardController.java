@@ -28,8 +28,8 @@ public class BoardController {
         return boardService.createList(request);
     }
 
-    @PutMapping("/lists/{listId}")
-    public TaskListDto updateList(@PathVariable Long listId, @RequestBody UpdateListRequest request) {
+    @PatchMapping("/lists/{listId}")
+    public TaskListDto updateList(@PathVariable Long listId, @Valid @RequestBody UpdateListRequest request) {
         return boardService.updateList(listId, request);
     }
 
@@ -45,8 +45,8 @@ public class BoardController {
         return boardService.createCard(listId, request);
     }
 
-    @PutMapping("/cards/{cardId}")
-    public CardDto updateCard(@PathVariable Long cardId, @RequestBody UpdateCardRequest request) {
+    @PatchMapping("/cards/{cardId}")
+    public CardDto updateCard(@PathVariable Long cardId, @Valid @RequestBody UpdateCardRequest request) {
         return boardService.updateCard(cardId, request);
     }
 

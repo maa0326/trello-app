@@ -21,7 +21,7 @@ export function createList(title) {
 }
 
 export function updateList(listId, updates) {
-  return request(`/lists/${listId}`, { method: 'PUT', body: JSON.stringify(updates) })
+  return request(`/lists/${listId}`, { method: 'PATCH', body: JSON.stringify(updates) })
 }
 
 export function deleteList(listId) {
@@ -33,7 +33,7 @@ export function createCard(listId, title) {
 }
 
 export function updateCard(cardId, updates) {
-  return request(`/cards/${cardId}`, { method: 'PUT', body: JSON.stringify(updates) })
+  return request(`/cards/${cardId}`, { method: 'PATCH', body: JSON.stringify(updates) })
 }
 
 export function deleteCard(cardId) {

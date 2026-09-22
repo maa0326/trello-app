@@ -2,10 +2,12 @@ import { useState } from 'react'
 import {
   DndContext,
   PointerSensor,
+  KeyboardSensor,
   useSensor,
   useSensors,
   closestCorners,
 } from '@dnd-kit/core'
+import { sortableKeyboardCoordinates } from '@dnd-kit/sortable'
 import List from './List'
 import CardModal from './CardModal'
 import * as api from '../api'
@@ -21,7 +23,8 @@ function Board({ data, setData }) {
   const [error, setError] = useState(null)
 
   const sensors = useSensors(
-    useSensor(PointerSensor, { activationConstraint: { distance: 5 } })
+    useSensor(PointerSensor, { activationConstraint: { distance: 5 } }),
+    useSensor(KeyboardSensor, { coordinateGetter: sortableKeyboardCoordinates })
   )
 
   const handleAddList = async (e) => {
@@ -226,7 +229,12 @@ function Board({ data, setData }) {
       </form>
 
       {openCard && (
-        <CardModal card={openCard} onClose={() => setOpenCard(null)} onSave={handleSaveCard} />
+        <CardModal
+          key={openCard.id}
+          card={openCard}
+          onClose={() => setOpenCard(null)}
+          onSave={handleSaveCard}
+        />
       )}
     </div>
   )
