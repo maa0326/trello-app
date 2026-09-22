@@ -4,6 +4,7 @@ export function normalizeCard(card) {
     priority: (card.priority || 'MID').toLowerCase(),
     dueDate: card.dueDate || '',
     description: card.description || '',
+    pinned: card.pinned || false,
   }
 }
 

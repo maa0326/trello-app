@@ -73,6 +73,17 @@ function Board({ data, setData }) {
     await api.updateList(listId, { sortMode })
   }
 
+  const handleTogglePin = async (cardId, pinned) => {
+    setData((prev) => ({
+      ...prev,
+      lists: prev.lists.map((l) => ({
+        ...l,
+        cards: l.cards.map((c) => (c.id === cardId ? { ...c, pinned } : c)),
+      })),
+    }))
+    await api.updateCard(cardId, { pinned })
+  }
+
   const handleSaveCard = async (cardId, updates) => {
     setData((prev) => ({
       ...prev,
@@ -144,6 +155,7 @@ function Board({ data, setData }) {
             onOpenCard={setOpenCard}
             onRenameList={handleRenameList}
             onChangeSortMode={handleChangeSortMode}
+            onTogglePin={handleTogglePin}
           />
         ))}
       </DndContext>

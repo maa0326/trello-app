@@ -34,6 +34,9 @@ public class Card {
     @Column(nullable = false)
     private int position;
 
+    @Column(nullable = false, columnDefinition = "boolean default false")
+    private boolean pinned = false;
+
     @Column(nullable = false, updatable = false)
     private Instant createdAt = Instant.now();
 

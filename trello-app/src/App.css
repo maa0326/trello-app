@@ -227,6 +227,28 @@
   padding: 2px 4px;
 }
 
+.card-pin {
+  position: absolute;
+  top: 4px;
+  right: 26px;
+  border: none;
+  background: transparent;
+  cursor: pointer;
+  font-size: 13px;
+  line-height: 1;
+  padding: 2px 4px;
+  opacity: 0.35;
+}
+
+.card-pin:hover,
+.card-pin.pinned {
+  opacity: 1;
+}
+
+.card-pinned {
+  box-shadow: 0 0 0 2px #f2b024, 0 1px 0 rgba(9, 30, 66, 0.25);
+}
+
 .card-delete:hover {
   color: #172b4d;
 }

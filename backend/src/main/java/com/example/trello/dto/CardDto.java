@@ -11,6 +11,7 @@ public record CardDto(
         LocalDate dueDate,
         Priority priority,
         int position,
-        long createdAt
+        long createdAt,
+        boolean pinned
 ) {
 }
