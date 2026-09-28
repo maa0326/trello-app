@@ -6,6 +6,7 @@ function Login({ onLoggedIn }) {
   const [mode, setMode] = useState('login')
   const [username, setUsername] = useState('')
   const [password, setPassword] = useState('')
+  const [showPassword, setShowPassword] = useState(false)
   const [error, setError] = useState(null)
   const [submitting, setSubmitting] = useState(false)
 
@@ -52,13 +53,24 @@ function Login({ onLoggedIn }) {
 
         <label className="modal-label">
           パスワード
-          <input
-            type="password"
-            value={password}
-            onChange={(e) => setPassword(e.target.value)}
-            required
-            minLength={mode === 'register' ? 8 : undefined}
-          />
+          <div className="password-input-wrapper">
+            <input
+              type={showPassword ? 'text' : 'password'}
+              value={password}
+              onChange={(e) => setPassword(e.target.value)}
+              required
+              minLength={mode === 'register' ? 8 : undefined}
+            />
+            <button
+              type="button"
+              className="password-toggle"
+              onClick={() => setShowPassword((prev) => !prev)}
+              aria-label={showPassword ? 'パスワードを隠す' : 'パスワードを表示'}
+              title={showPassword ? 'パスワードを隠す' : 'パスワードを表示'}
+            >
+              {showPassword ? '🙈' : '👁️'}
+            </button>
+          </div>
         </label>
 
         {error && <p className="error-banner">{error}</p>}
