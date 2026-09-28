@@ -295,12 +295,11 @@
 }
 
 .sort-option {
-  flex: 1;
   border: none;
   background: #dfe1e6;
   color: #172b4d;
   font-size: 11px;
-  padding: 4px 2px;
+  padding: 4px 10px;
   border-radius: 4px;
   cursor: pointer;
 }
