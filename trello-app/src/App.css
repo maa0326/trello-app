@@ -190,10 +190,12 @@
 
 .board {
   display: flex;
+  flex-wrap: wrap;
   align-items: flex-start;
   gap: 12px;
   padding: 0 20px 20px;
-  overflow-x: auto;
+  overflow-x: hidden;
+  overflow-y: auto;
   flex: 1;
 }
 
