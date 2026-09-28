@@ -35,7 +35,11 @@ function List({
     transform,
     transition,
     isDragging,
-  } = useSortable({ id: `list-${list.id}`, data: { type: 'list', listId: list.id } })
+  } = useSortable({
+    id: `list-${list.id}`,
+    data: { type: 'list', listId: list.id },
+    disabled: list.pinned,
+  })
 
   const listStyle = {
     transform: CSS.Transform.toString(transform),

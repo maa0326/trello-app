@@ -217,6 +217,10 @@
   cursor: grab;
 }
 
+.list-pinned .list-header {
+  cursor: default;
+}
+
 .list-title-input {
   flex: 1;
   border: none;

@@ -51,10 +51,10 @@ export function deleteList(listId) {
   return request(`/lists/${listId}`, { method: 'DELETE' })
 }
 
-export function moveList(listId, targetPosition) {
+export function moveList(listId, beforeListId) {
   return request(`/lists/${listId}/move`, {
     method: 'PUT',
-    body: JSON.stringify({ targetPosition }),
+    body: JSON.stringify({ beforeListId }),
   })
 }
 
