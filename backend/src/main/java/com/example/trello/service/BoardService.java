@@ -56,6 +56,20 @@ public class BoardService {
         taskListRepository.deleteById(listId);
     }
 
+    public void moveList(Long listId, MoveListRequest request) {
+        TaskList list = getListOrThrow(listId);
+        List<TaskList> lists = new ArrayList<>(taskListRepository.findAllByOrderByPositionAsc());
+        lists.removeIf(l -> l.getId().equals(listId));
+
+        int insertAt = Math.max(0, Math.min(request.targetPosition(), lists.size()));
+        lists.add(insertAt, list);
+
+        for (int i = 0; i < lists.size(); i++) {
+            lists.get(i).setPosition(i);
+        }
+        taskListRepository.saveAll(lists);
+    }
+
     public CardDto createCard(Long listId, CreateCardRequest request) {
         TaskList list = getListOrThrow(listId);
         Card card = new Card();

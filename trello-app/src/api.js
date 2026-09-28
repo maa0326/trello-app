@@ -51,6 +51,13 @@ export function deleteList(listId) {
   return request(`/lists/${listId}`, { method: 'DELETE' })
 }
 
+export function moveList(listId, targetPosition) {
+  return request(`/lists/${listId}/move`, {
+    method: 'PUT',
+    body: JSON.stringify({ targetPosition }),
+  })
+}
+
 export function createCard(listId, title) {
   return request(`/lists/${listId}/cards`, { method: 'POST', body: JSON.stringify({ title }) })
 }
