@@ -5,6 +5,7 @@ import lombok.Getter;
 import lombok.NoArgsConstructor;
 import lombok.Setter;
 
+import java.time.Instant;
 import java.util.ArrayList;
 import java.util.List;
 
@@ -27,6 +28,11 @@ public class TaskList {
 
     @Column(nullable = false)
     private String sortMode = "manual";
+
+    @Column(nullable = false, columnDefinition = "boolean default false")
+    private boolean pinned = false;
+
+    private Instant pinnedAt;
 
     @OneToMany(mappedBy = "taskList", cascade = CascadeType.ALL, orphanRemoval = true)
     @OrderBy("position ASC")

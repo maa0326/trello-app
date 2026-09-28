@@ -49,6 +49,10 @@ public class BoardService {
         if (request.sortMode() != null) {
             list.setSortMode(request.sortMode());
         }
+        if (request.pinned() != null) {
+            list.setPinned(request.pinned());
+            list.setPinnedAt(request.pinned() ? Instant.now() : null);
+        }
         return toDto(taskListRepository.save(list));
     }
 
@@ -156,7 +160,15 @@ public class BoardService {
         List<CardDto> cardDtos = list.getCards().stream()
                 .map(this::toDto)
                 .toList();
-        return new TaskListDto(list.getId(), list.getTitle(), list.getPosition(), list.getSortMode(), cardDtos);
+        return new TaskListDto(
+                list.getId(),
+                list.getTitle(),
+                list.getPosition(),
+                list.getSortMode(),
+                list.isPinned(),
+                list.getPinnedAt() != null ? list.getPinnedAt().toEpochMilli() : null,
+                cardDtos
+        );
     }
 
     private CardDto toDto(Card card) {

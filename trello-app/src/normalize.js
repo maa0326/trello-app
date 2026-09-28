@@ -13,6 +13,8 @@ export function normalizeList(list) {
   return {
     ...list,
     sortMode: list.sortMode || 'manual',
+    pinned: list.pinned || false,
+    pinnedAt: list.pinnedAt || null,
     cards: (list.cards || []).map(normalizeCard),
   }
 }

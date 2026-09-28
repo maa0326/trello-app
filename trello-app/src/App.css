@@ -247,6 +247,25 @@
   background: #d9dbe0;
 }
 
+.list-pin {
+  border: none;
+  background: transparent;
+  cursor: pointer;
+  font-size: 13px;
+  line-height: 1;
+  padding: 4px 6px;
+  opacity: 0.35;
+}
+
+.list-pin:hover,
+.list-pin.pinned {
+  opacity: 1;
+}
+
+.list-pinned {
+  box-shadow: 0 0 0 2px #f2b024;
+}
+
 .card-list {
   display: flex;
   flex-direction: column;

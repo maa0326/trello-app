@@ -22,6 +22,7 @@ function List({
   onRenameList,
   onChangeSortMode,
   onTogglePin,
+  onToggleListPin,
   forceExpanded,
 }) {
   const [newCardTitle, setNewCardTitle] = useState('')
@@ -57,7 +58,12 @@ function List({
   }
 
   return (
-    <div className="list" ref={setSortableRef} style={listStyle} {...listDragAttributes}>
+    <div
+      className={`list ${list.pinned ? 'list-pinned' : ''}`}
+      ref={setSortableRef}
+      style={listStyle}
+      {...listDragAttributes}
+    >
       <div className="list-header" {...listDragListeners}>
         <input
           className="list-title-input"
@@ -65,6 +71,15 @@ function List({
           onChange={(e) => onRenameList(list.id, e.target.value)}
           onPointerDown={(e) => e.stopPropagation()}
         />
+        <button
+          type="button"
+          className={`list-pin ${list.pinned ? 'pinned' : ''}`}
+          title={list.pinned ? '固定を解除' : 'リストを固定'}
+          onPointerDown={(e) => e.stopPropagation()}
+          onClick={() => onToggleListPin(list.id, !list.pinned)}
+        >
+          📌
+        </button>
         <button
           type="button"
           className="list-delete"
