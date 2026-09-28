@@ -200,8 +200,8 @@
 .list {
   background: #ebecf0;
   border-radius: 8px;
-  width: 260px;
-  min-width: 260px;
+  width: 620px;
+  min-width: 620px;
   padding: 8px;
   display: flex;
   flex-direction: column;
@@ -245,10 +245,11 @@
 }
 
 .card-list {
-  display: flex;
-  flex-direction: column;
+  display: grid;
+  grid-template-columns: repeat(4, 1fr);
   gap: 6px;
   min-height: 4px;
+  align-items: start;
 }
 
 .card {
@@ -438,6 +439,10 @@
   .list {
     width: 100%;
     min-width: 0;
+  }
+
+  .card-list {
+    grid-template-columns: 1fr;
   }
 
   .add-list-form {
