@@ -234,6 +234,9 @@
   padding: 8px 10px;
   box-shadow: 0 1px 0 rgba(9, 30, 66, 0.25);
   cursor: grab;
+  touch-action: none;
+  -webkit-user-select: none;
+  user-select: none;
 }
 
 .card-title {
