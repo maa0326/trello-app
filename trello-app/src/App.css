@@ -404,6 +404,24 @@
   background: rgba(255, 255, 255, 0.4);
 }
 
+@media (max-width: 768px) {
+  .board {
+    flex-direction: column;
+    overflow-x: hidden;
+    overflow-y: auto;
+  }
+
+  .list {
+    width: 100%;
+    min-width: 0;
+  }
+
+  .add-list-form {
+    width: 100%;
+    min-width: 0;
+  }
+}
+
 .modal-overlay {
   position: fixed;
   inset: 0;
