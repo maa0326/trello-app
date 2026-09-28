@@ -7,6 +7,8 @@ public record TaskListDto(
         String title,
         int position,
         String sortMode,
+        boolean pinned,
+        Long pinnedAt,
         List<CardDto> cards
 ) {
 }

@@ -110,6 +110,21 @@ function Board({ data, setData }) {
     }
   }
 
+  const handleToggleListPin = async (listId, pinned) => {
+    const prevData = data
+    const pinnedAt = pinned ? Date.now() : null
+    setData((prev) => ({
+      ...prev,
+      lists: prev.lists.map((l) => (l.id === listId ? { ...l, pinned, pinnedAt } : l)),
+    }))
+    try {
+      await api.updateList(listId, { pinned })
+    } catch (err) {
+      setData(prevData)
+      setError(err.message)
+    }
+  }
+
   const handleTogglePin = async (cardId, pinned) => {
     const prevData = data
     const pinnedAt = pinned ? Date.now() : null
@@ -260,6 +275,7 @@ function Board({ data, setData }) {
               onRenameList={handleRenameList}
               onChangeSortMode={handleChangeSortMode}
               onTogglePin={handleTogglePin}
+              onToggleListPin={handleToggleListPin}
               forceExpanded={isDragging}
             />
           ))}
