@@ -170,23 +170,44 @@ function Board({ data, setData }) {
     if (!over || active.id === over.id) return
 
     const sourceListId = active.data.current.listId
-    const prevData = data
-    const lists = [...data.lists]
-    const sourceIndex = lists.findIndex((l) => l.id === sourceListId)
+    const all = data.lists
+    const sourceList = all.find((l) => l.id === sourceListId)
+    if (!sourceList || sourceList.pinned) return
 
-    let targetIndex
+    // ピン留めされたリストは絶対位置(スロット)を固定し、ピン留めなしのリストだけを
+    // その隙間を避けて並べ替える(バックエンドのmoveListと同じアルゴリズム)
+    let beforeListId = null
     if (over.data.current?.type === 'list') {
-      targetIndex = lists.findIndex((l) => l.id === over.data.current.listId)
-    } else {
-      targetIndex = lists.length - 1
+      const overListId = over.data.current.listId
+      const overList = all.find((l) => l.id === overListId)
+      if (overList?.pinned) {
+        const overAbsIndex = all.findIndex((l) => l.id === overListId)
+        const nextUnpinned = all.slice(overAbsIndex + 1).find((l) => !l.pinned)
+        beforeListId = nextUnpinned ? nextUnpinned.id : null
+      } else {
+        beforeListId = overListId
+      }
     }
-    if (sourceIndex === -1 || targetIndex === -1) return
 
-    const [movedList] = lists.splice(sourceIndex, 1)
-    lists.splice(targetIndex, 0, movedList)
+    const pinnedBySlot = new Map()
+    all.forEach((l, i) => {
+      if (l.pinned) pinnedBySlot.set(i, l)
+    })
+
+    const unpinned = all.filter((l) => !l.pinned && l.id !== sourceListId)
+    const insertAt = beforeListId == null ? unpinned.length : unpinned.findIndex((l) => l.id === beforeListId)
+    unpinned.splice(insertAt === -1 ? unpinned.length : insertAt, 0, sourceList)
+
+    const lists = []
+    let ui = 0
+    for (let i = 0; i < all.length; i++) {
+      lists.push(pinnedBySlot.has(i) ? pinnedBySlot.get(i) : unpinned[ui++])
+    }
+
+    const prevData = data
     setData((prev) => ({ ...prev, lists }))
 
-    api.moveList(sourceListId, targetIndex).catch((err) => {
+    api.moveList(sourceListId, beforeListId).catch((err) => {
       setData(prevData)
       setError(err.message)
     })

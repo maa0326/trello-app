@@ -10,12 +10,17 @@ import com.example.trello.repository.CardRepository;
 import com.example.trello.repository.TaskListRepository;
 import jakarta.persistence.EntityNotFoundException;
 import lombok.RequiredArgsConstructor;
+import org.springframework.http.HttpStatus;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
+import org.springframework.web.server.ResponseStatusException;
 
 import java.time.Instant;
 import java.util.ArrayList;
+import java.util.Iterator;
+import java.util.LinkedHashMap;
 import java.util.List;
+import java.util.Map;
 
 @Service
 @RequiredArgsConstructor
@@ -62,16 +67,49 @@ public class BoardService {
 
     public void moveList(Long listId, MoveListRequest request) {
         TaskList list = getListOrThrow(listId);
-        List<TaskList> lists = new ArrayList<>(taskListRepository.findAllByOrderByPositionAsc());
-        lists.removeIf(l -> l.getId().equals(listId));
-
-        int insertAt = Math.max(0, Math.min(request.targetPosition(), lists.size()));
-        lists.add(insertAt, list);
-
-        for (int i = 0; i < lists.size(); i++) {
-            lists.get(i).setPosition(i);
+        if (list.isPinned()) {
+            throw new ResponseStatusException(HttpStatus.BAD_REQUEST, "ピン留めされたリストは移動できません");
         }
-        taskListRepository.saveAll(lists);
+
+        List<TaskList> all = new ArrayList<>(taskListRepository.findAllByOrderByPositionAsc());
+
+        // ピン留めされたリストは絶対位置(スロット)を固定する。
+        // ピン留めなしのリストだけを並べ替え対象にし、固定スロットを避けて詰め直す。
+        Map<Integer, TaskList> pinnedBySlot = new LinkedHashMap<>();
+        for (int i = 0; i < all.size(); i++) {
+            if (all.get(i).isPinned()) {
+                pinnedBySlot.put(i, all.get(i));
+            }
+        }
+
+        List<TaskList> unpinned = new ArrayList<>(all.stream().filter(l -> !l.isPinned()).toList());
+        unpinned.removeIf(l -> l.getId().equals(listId));
+
+        int insertAt = unpinned.size();
+        if (request.beforeListId() != null) {
+            int found = -1;
+            for (int i = 0; i < unpinned.size(); i++) {
+                if (unpinned.get(i).getId().equals(request.beforeListId())) {
+                    found = i;
+                    break;
+                }
+            }
+            if (found != -1) {
+                insertAt = found;
+            }
+        }
+        unpinned.add(insertAt, list);
+
+        List<TaskList> result = new ArrayList<>();
+        Iterator<TaskList> unpinnedIterator = unpinned.iterator();
+        for (int i = 0; i < all.size(); i++) {
+            result.add(pinnedBySlot.containsKey(i) ? pinnedBySlot.get(i) : unpinnedIterator.next());
+        }
+
+        for (int i = 0; i < result.size(); i++) {
+            result.get(i).setPosition(i);
+        }
+        taskListRepository.saveAll(result);
     }
 
     public CardDto createCard(Long listId, CreateCardRequest request) {
