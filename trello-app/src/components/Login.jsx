@@ -19,7 +19,7 @@ function Login({ onLoggedIn }) {
       saveAuth(auth)
       onLoggedIn(auth.username)
     } catch (err) {
-      setError(err.message)
+      setError(err.message || '通信に失敗しました。しばらくしてから再度お試しください。')
     } finally {
       setSubmitting(false)
     }

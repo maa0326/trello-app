@@ -37,7 +37,7 @@ function Board({ data, setData }) {
       const created = await api.createList(title)
       setData((prev) => ({ ...prev, lists: [...prev.lists, normalizeList(created)] }))
     } catch (err) {
-      setError(err.message)
+      setError(err.message || '操作に失敗しました')
     }
   }
 
@@ -48,7 +48,7 @@ function Board({ data, setData }) {
       await api.deleteList(listId)
     } catch (err) {
       setData(prevData)
-      setError(err.message)
+      setError(err.message || '操作に失敗しました')
     }
   }
 
@@ -62,7 +62,7 @@ function Board({ data, setData }) {
       await api.updateList(listId, { title })
     } catch (err) {
       setData(prevData)
-      setError(err.message)
+      setError(err.message || '操作に失敗しました')
     }
   }
 
@@ -76,7 +76,7 @@ function Board({ data, setData }) {
         ),
       }))
     } catch (err) {
-      setError(err.message)
+      setError(err.message || '操作に失敗しました')
     }
   }
 
@@ -92,7 +92,7 @@ function Board({ data, setData }) {
       await api.deleteCard(cardId)
     } catch (err) {
       setData(prevData)
-      setError(err.message)
+      setError(err.message || '操作に失敗しました')
     }
   }
 
@@ -106,7 +106,7 @@ function Board({ data, setData }) {
       await api.updateList(listId, { sortMode })
     } catch (err) {
       setData(prevData)
-      setError(err.message)
+      setError(err.message || '操作に失敗しました')
     }
   }
 
@@ -121,7 +121,7 @@ function Board({ data, setData }) {
       await api.updateList(listId, { pinned })
     } catch (err) {
       setData(prevData)
-      setError(err.message)
+      setError(err.message || '操作に失敗しました')
     }
   }
 
@@ -139,7 +139,7 @@ function Board({ data, setData }) {
       await api.updateCard(cardId, { pinned })
     } catch (err) {
       setData(prevData)
-      setError(err.message)
+      setError(err.message || '操作に失敗しました')
     }
   }
 
@@ -161,7 +161,7 @@ function Board({ data, setData }) {
       })
     } catch (err) {
       setData(prevData)
-      setError(err.message)
+      setError(err.message || '操作に失敗しました')
     }
   }
 
@@ -209,7 +209,7 @@ function Board({ data, setData }) {
 
     api.moveList(sourceListId, beforeListId).catch((err) => {
       setData(prevData)
-      setError(err.message)
+      setError(err.message || '操作に失敗しました')
     })
   }
 
@@ -262,7 +262,7 @@ function Board({ data, setData }) {
         .moveCard(moveInfo.cardId, moveInfo.targetListId, moveInfo.targetPosition)
         .catch((err) => {
           setData(prevData)
-          setError(err.message)
+          setError(err.message || '操作に失敗しました')
         })
     }
   }
