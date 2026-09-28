@@ -5,12 +5,15 @@ import com.example.trello.entity.Card;
 import com.example.trello.entity.CardDeletionLog;
 import com.example.trello.entity.Priority;
 import com.example.trello.entity.TaskList;
+import com.example.trello.entity.User;
 import com.example.trello.repository.CardDeletionLogRepository;
 import com.example.trello.repository.CardRepository;
 import com.example.trello.repository.TaskListRepository;
+import com.example.trello.repository.UserRepository;
 import jakarta.persistence.EntityNotFoundException;
 import lombok.RequiredArgsConstructor;
 import org.springframework.http.HttpStatus;
+import org.springframework.security.core.context.SecurityContextHolder;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 import org.springframework.web.server.ResponseStatusException;
@@ -30,24 +33,27 @@ public class BoardService {
     private final TaskListRepository taskListRepository;
     private final CardRepository cardRepository;
     private final CardDeletionLogRepository cardDeletionLogRepository;
+    private final UserRepository userRepository;
 
     public List<TaskListDto> getBoard() {
-        return taskListRepository.findAllByOrderByPositionAsc()
+        return taskListRepository.findAllByOwnerOrderByPositionAsc(currentUser())
                 .stream()
                 .map(this::toDto)
                 .toList();
     }
 
     public TaskListDto createList(CreateListRequest request) {
-        int nextPosition = taskListRepository.findAllByOrderByPositionAsc().size();
+        User owner = currentUser();
+        int nextPosition = taskListRepository.findAllByOwnerOrderByPositionAsc(owner).size();
         TaskList list = new TaskList();
         list.setTitle(request.title());
         list.setPosition(nextPosition);
+        list.setOwner(owner);
         return toDto(taskListRepository.save(list));
     }
 
     public TaskListDto updateList(Long listId, UpdateListRequest request) {
-        TaskList list = getListOrThrow(listId);
+        TaskList list = getOwnedListOrThrow(listId);
         if (request.title() != null && !request.title().isBlank()) {
             list.setTitle(request.title());
         }
@@ -62,16 +68,17 @@ public class BoardService {
     }
 
     public void deleteList(Long listId) {
-        taskListRepository.deleteById(listId);
+        TaskList list = getOwnedListOrThrow(listId);
+        taskListRepository.deleteById(list.getId());
     }
 
     public void moveList(Long listId, MoveListRequest request) {
-        TaskList list = getListOrThrow(listId);
+        TaskList list = getOwnedListOrThrow(listId);
         if (list.isPinned()) {
             throw new ResponseStatusException(HttpStatus.BAD_REQUEST, "ピン留めされたリストは移動できません");
         }
 
-        List<TaskList> all = new ArrayList<>(taskListRepository.findAllByOrderByPositionAsc());
+        List<TaskList> all = new ArrayList<>(taskListRepository.findAllByOwnerOrderByPositionAsc(list.getOwner()));
 
         // ピン留めされたリストは絶対位置(スロット)を固定する。
         // ピン留めなしのリストだけを並べ替え対象にし、固定スロットを避けて詰め直す。
@@ -113,7 +120,7 @@ public class BoardService {
     }
 
     public CardDto createCard(Long listId, CreateCardRequest request) {
-        TaskList list = getListOrThrow(listId);
+        TaskList list = getOwnedListOrThrow(listId);
         Card card = new Card();
         card.setTitle(request.title());
         card.setPosition(list.getCards().size());
@@ -122,7 +129,7 @@ public class BoardService {
     }
 
     public CardDto updateCard(Long cardId, UpdateCardRequest request) {
-        Card card = getCardOrThrow(cardId);
+        Card card = getOwnedCardOrThrow(cardId);
         if (request.title() != null && !request.title().isBlank()) {
             card.setTitle(request.title());
         }
@@ -143,22 +150,22 @@ public class BoardService {
     }
 
     public void deleteCard(Long cardId) {
-        Card card = getCardOrThrow(cardId);
+        Card card = getOwnedCardOrThrow(cardId);
         cardDeletionLogRepository.save(new CardDeletionLog(card.getId(), card.getTitle()));
-        cardRepository.deleteById(cardId);
+        cardRepository.deleteById(card.getId());
     }
 
     public List<CardDto> searchCards(String keyword, Priority priority) {
-        return cardRepository.search(keyword, priority)
+        return cardRepository.search(currentUser(), keyword, priority)
                 .stream()
                 .map(this::toDto)
                 .toList();
     }
 
     public void moveCard(Long cardId, MoveCardRequest request) {
-        Card card = getCardOrThrow(cardId);
+        Card card = getOwnedCardOrThrow(cardId);
         TaskList sourceList = card.getTaskList();
-        TaskList targetList = getListOrThrow(request.targetListId());
+        TaskList targetList = getOwnedListOrThrow(request.targetListId());
 
         // TaskList.cards は orphanRemoval=true のため、collection の remove/add 経由で
         // 付け替えるとHibernateがsourceList側の除去を「孤立」と見なして物理削除してしまう。
@@ -184,14 +191,26 @@ public class BoardService {
         }
     }
 
-    private TaskList getListOrThrow(Long id) {
-        return taskListRepository.findById(id)
-                .orElseThrow(() -> new EntityNotFoundException("List not found: " + id));
+    private User currentUser() {
+        String username = SecurityContextHolder.getContext().getAuthentication().getName();
+        return userRepository.findByUsername(username)
+                .orElseThrow(() -> new ResponseStatusException(HttpStatus.UNAUTHORIZED, "認証が必要です"));
     }
 
-    private Card getCardOrThrow(Long id) {
-        return cardRepository.findById(id)
+    private TaskList getOwnedListOrThrow(Long id) {
+        TaskList list = taskListRepository.findById(id)
+                .orElseThrow(() -> new EntityNotFoundException("List not found: " + id));
+        if (!currentUser().getId().equals(list.getOwner() != null ? list.getOwner().getId() : null)) {
+            throw new EntityNotFoundException("List not found: " + id);
+        }
+        return list;
+    }
+
+    private Card getOwnedCardOrThrow(Long id) {
+        Card card = cardRepository.findById(id)
                 .orElseThrow(() -> new EntityNotFoundException("Card not found: " + id));
+        getOwnedListOrThrow(card.getTaskList().getId());
+        return card;
     }
 
     private TaskListDto toDto(TaskList list) {
