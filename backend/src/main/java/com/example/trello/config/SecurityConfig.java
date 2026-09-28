@@ -58,13 +58,19 @@ public class SecurityConfig {
 
     @Bean
     public CorsConfigurationSource corsConfigurationSource() {
-        List<String> origins = List.of(allowedOrigins.split(",")).stream()
+        List<String> configuredOrigins = List.of(allowedOrigins.split(",")).stream()
                 .map(String::trim)
                 .filter(origin -> !origin.isEmpty())
                 .toList();
 
+        // スマホ等から同一LAN経由(http://<LAN IP>:<port>)でアクセスした場合も許可する
+        List<String> patterns = new java.util.ArrayList<>(configuredOrigins);
+        patterns.add("http://192.168.*.*:*");
+        patterns.add("http://10.*.*.*:*");
+        patterns.add("http://172.16.*.*:*");
+
         CorsConfiguration config = new CorsConfiguration();
-        config.setAllowedOrigins(origins);
+        config.setAllowedOriginPatterns(patterns);
         config.setAllowedMethods(List.of("GET", "POST", "PUT", "PATCH", "DELETE", "OPTIONS"));
         config.setAllowedHeaders(List.of("*"));
 
