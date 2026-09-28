@@ -39,6 +39,12 @@ public class BoardController {
         boardService.deleteList(listId);
     }
 
+    @PutMapping("/lists/{listId}/move")
+    @ResponseStatus(HttpStatus.NO_CONTENT)
+    public void moveList(@PathVariable Long listId, @Valid @RequestBody MoveListRequest request) {
+        boardService.moveList(listId, request);
+    }
+
     @PostMapping("/lists/{listId}/cards")
     @ResponseStatus(HttpStatus.CREATED)
     public CardDto createCard(@PathVariable Long listId, @Valid @RequestBody CreateCardRequest request) {

@@ -7,7 +7,7 @@ import {
   useSensors,
   closestCorners,
 } from '@dnd-kit/core'
-import { sortableKeyboardCoordinates } from '@dnd-kit/sortable'
+import { SortableContext, horizontalListSortingStrategy, sortableKeyboardCoordinates } from '@dnd-kit/sortable'
 import List from './List'
 import CardModal from './CardModal'
 import * as api from '../api'
@@ -150,8 +150,40 @@ function Board({ data, setData }) {
     }
   }
 
+  const handleMoveList = (event) => {
+    const { active, over } = event
+    if (!over || active.id === over.id) return
+
+    const sourceListId = active.data.current.listId
+    const prevData = data
+    const lists = [...data.lists]
+    const sourceIndex = lists.findIndex((l) => l.id === sourceListId)
+
+    let targetIndex
+    if (over.data.current?.type === 'list') {
+      targetIndex = lists.findIndex((l) => l.id === over.data.current.listId)
+    } else {
+      targetIndex = lists.length - 1
+    }
+    if (sourceIndex === -1 || targetIndex === -1) return
+
+    const [movedList] = lists.splice(sourceIndex, 1)
+    lists.splice(targetIndex, 0, movedList)
+    setData((prev) => ({ ...prev, lists }))
+
+    api.moveList(sourceListId, targetIndex).catch((err) => {
+      setData(prevData)
+      setError(err.message)
+    })
+  }
+
   const handleDragEnd = (event) => {
     setIsDragging(false)
+    if (event.active.data.current?.type === 'list') {
+      handleMoveList(event)
+      return
+    }
+
     const { active, over } = event
     if (!over) return
 
@@ -213,20 +245,25 @@ function Board({ data, setData }) {
         onDragEnd={handleDragEnd}
         onDragCancel={() => setIsDragging(false)}
       >
-        {data.lists.map((list) => (
-          <List
-            key={list.id}
-            list={list}
-            onAddCard={handleAddCard}
-            onDeleteList={handleDeleteList}
-            onDeleteCard={handleDeleteCard}
-            onOpenCard={setOpenCard}
-            onRenameList={handleRenameList}
-            onChangeSortMode={handleChangeSortMode}
-            onTogglePin={handleTogglePin}
-            forceExpanded={isDragging}
-          />
-        ))}
+        <SortableContext
+          items={data.lists.map((l) => `list-${l.id}`)}
+          strategy={horizontalListSortingStrategy}
+        >
+          {data.lists.map((list) => (
+            <List
+              key={list.id}
+              list={list}
+              onAddCard={handleAddCard}
+              onDeleteList={handleDeleteList}
+              onDeleteCard={handleDeleteCard}
+              onOpenCard={setOpenCard}
+              onRenameList={handleRenameList}
+              onChangeSortMode={handleChangeSortMode}
+              onTogglePin={handleTogglePin}
+              forceExpanded={isDragging}
+            />
+          ))}
+        </SortableContext>
       </DndContext>
 
       <form className="add-list-form" onSubmit={handleAddList}>

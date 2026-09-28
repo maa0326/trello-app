@@ -1,6 +1,7 @@
 import { useState } from 'react'
 import { useDroppable } from '@dnd-kit/core'
-import { SortableContext, verticalListSortingStrategy } from '@dnd-kit/sortable'
+import { SortableContext, verticalListSortingStrategy, useSortable } from '@dnd-kit/sortable'
+import { CSS } from '@dnd-kit/utilities'
 import Card from './Card'
 import { sortCards } from '../sort'
 
@@ -25,7 +26,22 @@ function List({
 }) {
   const [newCardTitle, setNewCardTitle] = useState('')
   const [expanded, setExpanded] = useState(false)
-  const { setNodeRef } = useDroppable({ id: list.id, data: { type: 'list' } })
+  const { setNodeRef: setDroppableRef } = useDroppable({ id: list.id, data: { type: 'list' } })
+  const {
+    attributes: listDragAttributes,
+    listeners: listDragListeners,
+    setNodeRef: setSortableRef,
+    transform,
+    transition,
+    isDragging,
+  } = useSortable({ id: `list-${list.id}`, data: { type: 'list', listId: list.id } })
+
+  const listStyle = {
+    transform: CSS.Transform.toString(transform),
+    transition,
+    opacity: isDragging ? 0.4 : 1,
+  }
+
   const sortMode = list.sortMode || 'manual'
   const sortedCards = sortCards(list.cards, sortMode)
   const hasMore = sortedCards.length > COLLAPSED_CARD_COUNT
@@ -41,14 +57,20 @@ function List({
   }
 
   return (
-    <div className="list">
-      <div className="list-header">
+    <div className="list" ref={setSortableRef} style={listStyle} {...listDragAttributes}>
+      <div className="list-header" {...listDragListeners}>
         <input
           className="list-title-input"
           value={list.title}
           onChange={(e) => onRenameList(list.id, e.target.value)}
+          onPointerDown={(e) => e.stopPropagation()}
         />
-        <button type="button" className="list-delete" onClick={() => onDeleteList(list.id)}>
+        <button
+          type="button"
+          className="list-delete"
+          onPointerDown={(e) => e.stopPropagation()}
+          onClick={() => onDeleteList(list.id)}
+        >
           削除
         </button>
       </div>
@@ -67,7 +89,7 @@ function List({
         ))}
       </div>
 
-      <div className="card-list" ref={setNodeRef}>
+      <div className="card-list" ref={setDroppableRef}>
         <SortableContext items={displayedCards.map((c) => c.id)} strategy={verticalListSortingStrategy}>
           {displayedCards.map((card) => (
             <Card
