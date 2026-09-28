@@ -200,8 +200,9 @@
 .list {
   background: #ebecf0;
   border-radius: 8px;
-  width: 620px;
-  min-width: 620px;
+  width: fit-content;
+  min-width: 260px;
+  max-width: 620px;
   padding: 8px;
   display: flex;
   flex-direction: column;
@@ -245,11 +246,12 @@
 }
 
 .card-list {
-  display: grid;
-  grid-template-columns: repeat(4, 140px);
+  display: flex;
+  flex-wrap: wrap;
   gap: 6px;
   min-height: 4px;
-  align-items: start;
+  align-content: flex-start;
+  max-width: 578px;
 }
 
 .card {
@@ -257,6 +259,9 @@
   background: white;
   border-radius: 6px;
   padding: 8px 10px;
+  flex: 0 0 140px;
+  width: 140px;
+  box-sizing: border-box;
   box-shadow: 0 1px 0 rgba(9, 30, 66, 0.25);
   cursor: grab;
 }
@@ -438,10 +443,16 @@
   .list {
     width: 100%;
     min-width: 0;
+    max-width: none;
   }
 
   .card-list {
-    grid-template-columns: 1fr;
+    max-width: none;
+  }
+
+  .card {
+    flex: 1 1 100%;
+    width: auto;
   }
 
   .add-list-form {
