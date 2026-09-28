@@ -1,8 +1,32 @@
 .app {
   min-height: 100vh;
-  background: #0079bf;
   display: flex;
   flex-direction: column;
+  background-color: #02040f;
+  background-image: url('./assets/night-sea-whale-bg.svg');
+  background-repeat: no-repeat;
+  background-position: center center;
+  background-size: cover;
+  background-attachment: fixed;
+  position: relative;
+}
+
+.app::after {
+  content: '🐋';
+  position: fixed;
+  right: 6%;
+  bottom: 4%;
+  font-size: 64px;
+  opacity: 0.9;
+  transform: scaleX(-1) rotate(-6deg);
+  filter: drop-shadow(0 0 12px rgba(150, 200, 255, 0.3));
+  pointer-events: none;
+  z-index: 0;
+}
+
+.app > * {
+  position: relative;
+  z-index: 1;
 }
 
 .app-header {
