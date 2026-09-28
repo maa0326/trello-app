@@ -69,22 +69,25 @@ function List({
           className="list-title-input"
           value={list.title}
           onChange={(e) => onRenameList(list.id, e.target.value)}
-          onPointerDown={(e) => e.stopPropagation()}
         />
         <button
           type="button"
           className={`list-pin ${list.pinned ? 'pinned' : ''}`}
           title={list.pinned ? '固定を解除' : 'リストを固定'}
-          onPointerDown={(e) => e.stopPropagation()}
-          onClick={() => onToggleListPin(list.id, !list.pinned)}
+          onClick={(e) => {
+            e.stopPropagation()
+            onToggleListPin(list.id, !list.pinned)
+          }}
         >
           📌
         </button>
         <button
           type="button"
           className="list-delete"
-          onPointerDown={(e) => e.stopPropagation()}
-          onClick={() => onDeleteList(list.id)}
+          onClick={(e) => {
+            e.stopPropagation()
+            onDeleteList(list.id)
+          }}
         >
           削除
         </button>
