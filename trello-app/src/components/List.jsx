@@ -1,6 +1,6 @@
 import { useState } from 'react'
 import { useDroppable } from '@dnd-kit/core'
-import { SortableContext, rectSortingStrategy } from '@dnd-kit/sortable'
+import { SortableContext, verticalListSortingStrategy } from '@dnd-kit/sortable'
 import Card from './Card'
 import { sortCards } from '../sort'
 
@@ -9,6 +9,8 @@ const SORT_OPTIONS = [
   { value: 'priority', label: '優先度順' },
   { value: 'newest', label: '新着順' },
 ]
+
+const COLLAPSED_CARD_COUNT = 3
 
 function List({
   list,
@@ -21,9 +23,12 @@ function List({
   onTogglePin,
 }) {
   const [newCardTitle, setNewCardTitle] = useState('')
+  const [expanded, setExpanded] = useState(false)
   const { setNodeRef } = useDroppable({ id: list.id, data: { type: 'list' } })
   const sortMode = list.sortMode || 'manual'
-  const displayedCards = sortCards(list.cards, sortMode)
+  const sortedCards = sortCards(list.cards, sortMode)
+  const hasMore = sortedCards.length > COLLAPSED_CARD_COUNT
+  const displayedCards = expanded || !hasMore ? sortedCards : sortedCards.slice(0, COLLAPSED_CARD_COUNT)
 
   const handleAddCard = (e) => {
     e.preventDefault()
@@ -61,7 +66,7 @@ function List({
       </div>
 
       <div className="card-list" ref={setNodeRef}>
-        <SortableContext items={displayedCards.map((c) => c.id)} strategy={rectSortingStrategy}>
+        <SortableContext items={displayedCards.map((c) => c.id)} strategy={verticalListSortingStrategy}>
           {displayedCards.map((card) => (
             <Card
               key={card.id}
@@ -73,6 +78,17 @@ function List({
           ))}
         </SortableContext>
       </div>
+
+      {hasMore && (
+        <button
+          type="button"
+          className="card-list-toggle"
+          onClick={() => setExpanded((prev) => !prev)}
+        >
+          <span className={`card-list-toggle-arrow ${expanded ? 'expanded' : ''}`}>▼</span>
+          {expanded ? '閉じる' : `他 ${sortedCards.length - COLLAPSED_CARD_COUNT} 件を表示`}
+        </button>
+      )}
 
       <form className="add-card-form" onSubmit={handleAddCard}>
         <input
