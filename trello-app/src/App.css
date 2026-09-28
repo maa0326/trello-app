@@ -202,9 +202,8 @@
 .list {
   background: #ebecf0;
   border-radius: 8px;
-  width: fit-content;
+  width: 280px;
   min-width: 260px;
-  max-width: 620px;
   padding: 8px;
   display: flex;
   flex-direction: column;
@@ -249,11 +248,9 @@
 
 .card-list {
   display: flex;
-  flex-wrap: wrap;
+  flex-direction: column;
   gap: 6px;
   min-height: 4px;
-  align-content: flex-start;
-  max-width: 578px;
 }
 
 .card {
@@ -261,11 +258,36 @@
   background: white;
   border-radius: 6px;
   padding: 8px 10px;
-  flex: 0 0 140px;
-  width: 140px;
+  width: 100%;
   box-sizing: border-box;
   box-shadow: 0 1px 0 rgba(9, 30, 66, 0.25);
   cursor: grab;
+}
+
+.card-list-toggle {
+  border: none;
+  background: transparent;
+  color: #5e6c84;
+  font-size: 12px;
+  padding: 6px 4px;
+  cursor: pointer;
+  text-align: left;
+  display: flex;
+  align-items: center;
+  gap: 4px;
+}
+
+.card-list-toggle:hover {
+  color: #172b4d;
+}
+
+.card-list-toggle-arrow {
+  display: inline-block;
+  transition: transform 0.15s ease;
+}
+
+.card-list-toggle-arrow.expanded {
+  transform: rotate(180deg);
 }
 
 .card-title {
@@ -445,16 +467,6 @@
   .list {
     width: 100%;
     min-width: 0;
-    max-width: none;
-  }
-
-  .card-list {
-    max-width: none;
-  }
-
-  .card {
-    flex: 1 1 100%;
-    width: auto;
   }
 
   .add-list-form {
