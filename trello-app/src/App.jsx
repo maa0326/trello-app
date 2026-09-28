@@ -29,7 +29,7 @@ function App() {
           handleLogout()
           return
         }
-        setError(err.message)
+        setError(err.message || 'データの取得に失敗しました')
       })
       .finally(() => setLoading(false))
     // eslint-disable-next-line react-hooks/exhaustive-deps
