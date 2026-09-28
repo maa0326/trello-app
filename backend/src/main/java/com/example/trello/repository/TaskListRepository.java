@@ -10,6 +10,4 @@ public interface TaskListRepository extends JpaRepository<TaskList, Long> {
     List<TaskList> findAllByOrderByPositionAsc();
 
     List<TaskList> findAllByOwnerOrderByPositionAsc(User owner);
-
-    List<TaskList> findAllByOwnerIsNull();
 }
