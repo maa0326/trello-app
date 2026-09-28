@@ -21,6 +21,7 @@ function Board({ data, setData }) {
   const [newListTitle, setNewListTitle] = useState('')
   const [openCard, setOpenCard] = useState(null)
   const [error, setError] = useState(null)
+  const [isDragging, setIsDragging] = useState(false)
 
   const sensors = useSensors(
     useSensor(PointerSensor, { activationConstraint: { distance: 5 } }),
@@ -150,6 +151,7 @@ function Board({ data, setData }) {
   }
 
   const handleDragEnd = (event) => {
+    setIsDragging(false)
     const { active, over } = event
     if (!over) return
 
@@ -204,7 +206,13 @@ function Board({ data, setData }) {
           操作に失敗しました: {error}(クリックで閉じる)
         </p>
       )}
-      <DndContext sensors={sensors} collisionDetection={closestCorners} onDragEnd={handleDragEnd}>
+      <DndContext
+        sensors={sensors}
+        collisionDetection={closestCorners}
+        onDragStart={() => setIsDragging(true)}
+        onDragEnd={handleDragEnd}
+        onDragCancel={() => setIsDragging(false)}
+      >
         {data.lists.map((list) => (
           <List
             key={list.id}
@@ -216,6 +224,7 @@ function Board({ data, setData }) {
             onRenameList={handleRenameList}
             onChangeSortMode={handleChangeSortMode}
             onTogglePin={handleTogglePin}
+            forceExpanded={isDragging}
           />
         ))}
       </DndContext>
