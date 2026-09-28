@@ -2,30 +2,13 @@
   min-height: 100vh;
   display: flex;
   flex-direction: column;
-  background:
-    radial-gradient(circle at 78% 12%, rgba(255, 250, 220, 0.9) 0%, rgba(255, 250, 220, 0.55) 6%, rgba(255, 250, 220, 0) 9%),
-    linear-gradient(180deg, #050a24 0%, #0a1a4a 35%, #0f2f6b 60%, #123a63 78%, #0a2444 100%);
-  background-attachment: fixed;
-  background-size: cover;
-  position: relative;
-  overflow-x: hidden;
-}
-
-.app::before {
-  content: '';
-  position: fixed;
-  inset: 0;
-  z-index: 0;
-  pointer-events: none;
-  background-image:
-    radial-gradient(1.5px 1.5px at 10% 15%, rgba(255, 255, 255, 0.8), transparent),
-    radial-gradient(1.5px 1.5px at 25% 8%, rgba(255, 255, 255, 0.6), transparent),
-    radial-gradient(1px 1px at 40% 20%, rgba(255, 255, 255, 0.7), transparent),
-    radial-gradient(1.5px 1.5px at 60% 6%, rgba(255, 255, 255, 0.6), transparent),
-    radial-gradient(1px 1px at 88% 25%, rgba(255, 255, 255, 0.5), transparent),
-    radial-gradient(1.5px 1.5px at 15% 30%, rgba(255, 255, 255, 0.5), transparent),
-    radial-gradient(1px 1px at 70% 30%, rgba(255, 255, 255, 0.6), transparent);
+  background-color: #02040f;
+  background-image: url('./assets/night-sea-whale-bg.svg');
   background-repeat: no-repeat;
+  background-position: center center;
+  background-size: cover;
+  background-attachment: fixed;
+  position: relative;
 }
 
 .app::after {
@@ -34,9 +17,9 @@
   right: 6%;
   bottom: 4%;
   font-size: 64px;
-  opacity: 0.35;
+  opacity: 0.9;
   transform: scaleX(-1) rotate(-6deg);
-  filter: drop-shadow(0 0 12px rgba(150, 200, 255, 0.25));
+  filter: drop-shadow(0 0 12px rgba(150, 200, 255, 0.3));
   pointer-events: none;
   z-index: 0;
 }
