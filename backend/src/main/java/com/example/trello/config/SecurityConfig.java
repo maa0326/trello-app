@@ -30,6 +30,9 @@ public class SecurityConfig {
     @Value("${app.cors.allowed-origins}")
     private String allowedOrigins;
 
+    @Value("${app.cors.allow-lan-patterns}")
+    private boolean allowLanPatterns;
+
     @Bean
     public PasswordEncoder passwordEncoder() {
         return new BCryptPasswordEncoder();
@@ -63,11 +66,13 @@ public class SecurityConfig {
                 .filter(origin -> !origin.isEmpty())
                 .toList();
 
-        // スマホ等から同一LAN経由(http://<LAN IP>:<port>)でアクセスした場合も許可する
+        // スマホ等から同一LAN経由(http://<LAN IP>:<port>)でアクセスした場合も許可する(開発時のみ)
         List<String> patterns = new java.util.ArrayList<>(configuredOrigins);
-        patterns.add("http://192.168.*.*:*");
-        patterns.add("http://10.*.*.*:*");
-        patterns.add("http://172.16.*.*:*");
+        if (allowLanPatterns) {
+            patterns.add("http://192.168.*.*:*");
+            patterns.add("http://10.*.*.*:*");
+            patterns.add("http://172.16.*.*:*");
+        }
 
         CorsConfiguration config = new CorsConfiguration();
         config.setAllowedOriginPatterns(patterns);

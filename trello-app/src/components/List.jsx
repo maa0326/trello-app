@@ -21,6 +21,7 @@ function List({
   onRenameList,
   onChangeSortMode,
   onTogglePin,
+  forceExpanded,
 }) {
   const [newCardTitle, setNewCardTitle] = useState('')
   const [expanded, setExpanded] = useState(false)
@@ -28,7 +29,8 @@ function List({
   const sortMode = list.sortMode || 'manual'
   const sortedCards = sortCards(list.cards, sortMode)
   const hasMore = sortedCards.length > COLLAPSED_CARD_COUNT
-  const displayedCards = expanded || !hasMore ? sortedCards : sortedCards.slice(0, COLLAPSED_CARD_COUNT)
+  const isExpanded = expanded || forceExpanded
+  const displayedCards = isExpanded || !hasMore ? sortedCards : sortedCards.slice(0, COLLAPSED_CARD_COUNT)
 
   const handleAddCard = (e) => {
     e.preventDefault()
@@ -85,8 +87,8 @@ function List({
           className="card-list-toggle"
           onClick={() => setExpanded((prev) => !prev)}
         >
-          <span className={`card-list-toggle-arrow ${expanded ? 'expanded' : ''}`}>▼</span>
-          {expanded ? '閉じる' : `他 ${sortedCards.length - COLLAPSED_CARD_COUNT} 件を表示`}
+          <span className={`card-list-toggle-arrow ${isExpanded ? 'expanded' : ''}`}>▼</span>
+          {isExpanded ? '閉じる' : `他 ${sortedCards.length - COLLAPSED_CARD_COUNT} 件を表示`}
         </button>
       )}
 
