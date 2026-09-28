@@ -1,6 +1,6 @@
 import { useState } from 'react'
 import { useDroppable } from '@dnd-kit/core'
-import { SortableContext, verticalListSortingStrategy } from '@dnd-kit/sortable'
+import { SortableContext, rectSortingStrategy } from '@dnd-kit/sortable'
 import Card from './Card'
 import { sortCards } from '../sort'
 
@@ -61,7 +61,7 @@ function List({
       </div>
 
       <div className="card-list" ref={setNodeRef}>
-        <SortableContext items={displayedCards.map((c) => c.id)} strategy={verticalListSortingStrategy}>
+        <SortableContext items={displayedCards.map((c) => c.id)} strategy={rectSortingStrategy}>
           {displayedCards.map((card) => (
             <Card
               key={card.id}
